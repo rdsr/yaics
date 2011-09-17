@@ -5,25 +5,30 @@
 
 (def table :comment)
 
-(defn insert [author content parent-id image-id]
-  (sql/with-connection current-db
-    (sql/insert-record
-     table
-     {:author author :content content :parent_id parent-id :image_id image-id})))
-
-(defn insert [author content id]
-  (if-let [record (fetch-record-by table id)]
-    (insert author content (record "parent_id") (record "image_id"))
-    (insert author content -1 id)))
+(defn insert
+  ([author content id]
+     (if-let [record (fetch-record-by table id)]
+       (insert author content (:parent_id record) (:image_id record))
+       (insert author content -1 id)))
+  ([author content parent-id image-id]
+     (insert-record
+      table
+      {:author author :content content :parent_id parent-id :image_id image-id})))
 
 (defn all-comments-for-image [id]
-  (sql/with-connection current-db
-    (sql/with-query-results res
-      [(str "select * from " (name table) " where image_id = ?") id])))
+  (fetch-records-by table id "image_id = ?"))
 
-(defn delete-comment [id]
+(defn delete [id]
   (delete-record table id))
 
 (defn approve [id]
   (update-record
-   table id (fn [record] (assoc record :hidden false))))
+   table
+   id
+   (fn [record] (assoc record :hidden false))))
+
+;; (insert "rdsr" "testing" -1 0)
+;; (approve 0)
+;; (delete 0)
+;; (all-comments-for-image 0)
+;; (insert "rs" "test" 0 0)

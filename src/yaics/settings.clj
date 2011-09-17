@@ -38,6 +38,7 @@
     (sql/create-table
      :comment
      [:id :int (if (= "mysql" p) "primary key auto_increment" "default 0")]
+     [:author "varchar(20)"]
      [:parent_id :int]
      [:image_id :int "not null"]
      [:content "varchar(1000)"]

@@ -1,36 +1,29 @@
 (ns yaics.db.image
   (:use [yaics.settings :only (current-db)])
+  (:use [yaics.db.common])
   (:require [clojure.java.jdbc :as sql]))
 
 (def table :image)
 
 (defn insert [title image-path]
-  (sql/with-connection current-db
-    (sql/insert-record
-     table
-     {:title title :path image-path})))
+  (insert-record
+   table
+   {:title title :path image-path}))
 
-(defn fetch-record-by-title [title]
-  (sql/with-connection current-db
-    (sql/with-query-results res
-      [(str "select * from " (name table) " where title = ?") title]
-      (-> res first))))
+(defn fetch-by-title [title]
+  (fetch-record-by table title "title = ?"))
 
-(defn fetch-record-by-id [id]
-  (sql/with-connection current-db
-    (sql/with-query-results res
-      [(str "select * from " (name table) " where id = ?") id]
-      (-> res first))))
-
-(defn update-record [id update]
-  (let [record (fetch-image-record-by-id id)]
-    (sql/with-connection current-db
-      (sql/update-values
-       table
-       ["id=?" id] (update record)))))
+(defn fetch-by-id [id]
+  (fetch-record-by table id))
 
 (defn increment-views [id]
-  (update-image-record
+  (update-record
+   table
    id
    (fn [record]
      (assoc record :views (inc (record :views))))))
+
+;; (insert "test_image" "/tmp/any_image.png")
+;; (fetch-by-title "test_image")
+;; (-> "test_image" fetch-by-title :id fetch-by-id)
+;; (-> "test_image" fetch-by-title :id increment-views)
