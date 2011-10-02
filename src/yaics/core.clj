@@ -7,8 +7,10 @@
             [compojure.handler :as handler]))
 
 (defroutes main-routes
-  (GET "/" [] (index-page))
-  ;;(GET "/comic/:id" [id] (file-response (-> id image/fetch-by-id :path)))
+  (GET "/" [] (homepage))
+  (GET "/comic/:id" [id]
+       (file-response (-> id image/fetch-by-id :path)
+                      {:root "resources/public"}))
   (route/resources "/")
   (route/not-found "Page not found"))
 
