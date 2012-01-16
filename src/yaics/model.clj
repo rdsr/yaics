@@ -1,28 +1,22 @@
-(ns yaics.settings
+(ns yaics.model
   (:require [clojure.java.jdbc :as sql]))
 
-(def mysql-db {:classname "com.mysql.jdbc.Driver"
-               :subprotocol "mysql"
-               :subname "//127.0.0.1:3306/site"
-               :user "yaics"
-               :password "yaics"})
+(def mysql-db-params
+  {:classname "com.mysql.jdbc.Driver"
+   :subprotocol "mysql"
+   :subname "//127.0.0.1:3306/site"
+   :user "yaics"
+   :password "yaics"})
 
-(def hsqldb-db {:classname "org.hsqldb.jdbcDriver"
-                :subprotocol "hsqldb"
-                :subname "/tmp/site_yaics_hsqldb"})
+(def hsql-db-params
+  {:classname "org.hsqldb.jdbcDriver"
+   :subprotocol "hsqldb"
+   :subname "/tmp/site_yaics_hsqldb"})
 
-(defn- clean-up
-  [db]
-  (sql/with-connection
-    db
-    (doseq [table [:image :comment :user]]
-      (try
-        (sql/drop-table table)
-        (catch Exception _)))))
+(def ^{:dynamic true} *db-params* hsql-db-params)
 
-(defn- create-image-table
-  [db]
-  (let [p (:subprotocol db)]
+(defn- image []
+  (let [p (:subprotocol *db-params*)]
     (sql/create-table
      :image
      [:id :int (if (= "mysql" p) "primary key auto_increment" "default 0")]
@@ -32,11 +26,10 @@
      [:created_at :timestamp "default current_timestamp"]
      :table-spec (if (= "mysql" p) "ENGINE=InnoDB" ""))))
 
-(defn- create-comment-table
-  [db]
-  (let [p (:subprotocol db)]
+(defn- comments []
+  (let [p (:subprotocol *db-params*)]
     (sql/create-table
-     :comment
+     :comments
      [:id :int (if (= "mysql" p) "primary key auto_increment" "default 0")]
      [:author "varchar(20)"]
      [:parent_id :int]
@@ -46,9 +39,8 @@
      [:date :timestamp "default current_timestamp"]
      :table-spec (if (= "mysql" p) "ENGINE=InnoDB" ""))))
 
-(defn- create-user-table
-  [db]
-  (let [p (:subprotocol db)]
+(defn- user []
+  (let [p (:subprotocol *db-params*)]
     (sql/create-table
      :user
      [:user_id "varchar(20)" (if (= "mysql" p) "primary key" "") "not null"]
@@ -57,10 +49,14 @@
      [:admin "boolean" "default false"]
      :table-spec (if (= "mysql" p) "ENGINE=InnoDB" ""))))
 
-(defn init [db]
-  (for [f [create-image-table create-comment-table create-user-table]]
-    (sql/with-connection db (f db))))
+(defn init []
+  (for [f [image comments user]]
+    (sql/with-connection *db-params* (f))))
 
-(def current-db hsqldb-db)
-;; (clean-up current-db)
-;; (init current-db)
+(defn clean-up []
+  (sql/with-connection
+    *db-params*
+    (doseq [table [:image :comments :user]]
+      (try
+        (sql/drop-table table)
+        (catch Exception _)))))
