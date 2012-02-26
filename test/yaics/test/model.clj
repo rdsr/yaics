@@ -1,12 +1,12 @@
 (ns yaics.test.model
   (:use [clojure.test])
-  (:require [yaics.model :as model] 
+  (:require [yaics.model :as model]
             [yaics.model.image :as image]
             [yaics.model.user :as user]
             [yaics.model.comments :as comments]))
 
 (deftest image-test []
-  (image/insert "test-image1" "/path/to/file1.jpg")
+  (image/insert "test-image1" "file1.jpg")
   (is (= "test-image1" (-> (image/fetch-latest) :title)))
   (is (= "test-image1" (-> "test-image1" image/fetch-by-title :title)))
 
@@ -23,7 +23,7 @@
   (is (true? (user/admin? "rdsr"))))
 
 (deftest comments-test []
-  (image/insert "test-image" "/path/to/file.jpg")
+  (image/insert "test-image" "file.jpg")
   (user/insert "rdsr" "rd" "sr")
   (let [image-id (-> (image/fetch-latest) :id)]
     (comments/insert "rdsr" "testing comments table" image-id)
@@ -36,6 +36,3 @@
   ;(f))
 
 ;(use-fixtures :each db-fixture)
-
-  
-  

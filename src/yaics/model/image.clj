@@ -5,10 +5,10 @@
 
 (def table :image)
 
-(defn insert [title image-path]
+(defn insert [title filename]
   (insert-record
    table
-   {:title title :path image-path}))
+   {:title title :filename filename}))
 
 (defn fetch-latest []
   (sql/with-connection *db-params*

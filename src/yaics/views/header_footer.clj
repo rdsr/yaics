@@ -1,9 +1,9 @@
-(ns yaics.views.constants
+(ns yaics.views.header-footer
   (:use [hiccup core page-helpers]))
 
 (defn render-header []
   [:div.header
-   [:em "YAICS - Yet Another Incidious Comic Strip"]])
+   [:em "Yaics : Yet Another Incidious Comic Strip"]])
 
 (defn render-footer []
   [:div.footer])

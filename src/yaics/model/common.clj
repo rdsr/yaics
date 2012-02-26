@@ -7,7 +7,7 @@
      (sql/with-connection *db-params*
        (sql/with-query-results res
          [(str "select * from "(name table)" where " where-clause) values]
-         res))))
+         (vec res))))) ;; returing it as a normal seq, throws "java.sql.SQLException: Operation not allowed after ResultSet closed"
 
 (defn fetch-record-by
   ([table value]
@@ -16,7 +16,8 @@
      (first (fetch-records-by table where-clause values))))
 
 (defn update-record
-  ([table id update-fn] (update-record table id ["id = ?" id] update-fn))
+  ([table id update-fn]
+     (update-record table id ["id = ?" id] update-fn))
   ([table id where-params update-fn]
      (let [record (fetch-record-by table id)]
        (sql/with-connection *db-params*

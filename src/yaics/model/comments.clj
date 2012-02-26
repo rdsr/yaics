@@ -6,7 +6,7 @@
 
 (defn insert
   ([author content image-id]
-     (if-let [record (fetch-record-by table "image_id = ?" image-id)]
+     (if-let [record (fetch-record-by table "image_id=?" image-id)]
        (insert author content (:parent_id record) image-id)
        (insert author content -1 image-id)))
   ([author content parent-id image-id]

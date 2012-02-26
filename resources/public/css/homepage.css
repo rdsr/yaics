@@ -1,0 +1,17 @@
+.header {
+    border-bottom: thick solid white;
+    background-color: orange;
+    width: 100%
+}
+
+.comic {
+}
+
+.comic .navigation {
+}
+
+.footer {
+    border-top: thick solid white;
+    background-color: orange;
+    width: 100%
+}
